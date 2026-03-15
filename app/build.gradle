@@ -19,15 +19,21 @@ def acraVersion = '5.11.3'
 // Can be overridden with -PreleaseRepoOwner / -PreleaseRepoName.
 def ghOwner = (findProperty("releaseRepoOwner") ?: "celikarda") as String
 def ghPackage = (findProperty("releaseRepoName") ?: "aa-torque") as String
+Properties keystoreProps = new Properties()
+def keystorePropsFile = rootProject.file("keystore.properties")
+def hasKeystoreProps = keystorePropsFile.exists()
+if (hasKeystoreProps) {
+    keystoreProps.load(new FileInputStream(keystorePropsFile))
+}
 
 
 android {
     namespace "com.aatorque.stats"
-    compileSdk 34
+    compileSdk 35
     defaultConfig {
         applicationId "com.aatorque.perfdash"
         minSdkVersion 28
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode versionMajor * 1000 + versionMinor * 100 + versionPatch * 10
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         vectorDrawables {
@@ -38,6 +44,16 @@ android {
     }
     applicationVariants.configureEach {
         buildConfigField "String", "RELEASE_URL", "\"https://api.github.com/repos/${ghOwner}/${ghPackage}/releases/latest\""
+    }
+    signingConfigs {
+        release {
+            if (hasKeystoreProps) {
+                storeFile file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
     }
     buildTypes {
         debug {
@@ -55,11 +71,11 @@ android {
             buildConfigField "boolean", "SIMULATE_METRICS", "true"
         }
         release {
-            debuggable true
+            debuggable false
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             resValue "string", "app_version", "${defaultConfig.versionName}"
-            signingConfig signingConfigs.debug
+            signingConfig hasKeystoreProps ? signingConfigs.release : signingConfigs.debug
         }
     }
     buildFeatures {
@@ -198,4 +214,13 @@ repositories {
     mavenCentral()
     jcenter()
     maven { url 'https://jitpack.io' }
+}
+
+gradle.taskGraph.whenReady { graph ->
+    if (
+        !hasKeystoreProps &&
+        (graph.hasTask(':app:bundleRelease') || graph.hasTask(':app:assembleRelease'))
+    ) {
+        println("WARNING: keystore.properties not found. Release artifacts are debug-signed and cannot be uploaded to Play.")
+    }
 }
