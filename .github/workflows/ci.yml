@@ -1,5 +1,9 @@
 name: ci
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - main
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -29,7 +33,7 @@ jobs:
     permissions:
       contents: write
       discussions: write
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v2
         with:
@@ -84,13 +88,29 @@ jobs:
       - name: Rename release
         run: mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/aa-torque.apk
 
-      - name: Create Github Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.bump_version.outputs.new_tag || 'latest' }}
-          name: ${{ steps.bump_version.outputs.new_tag || 'latest' }}
-          generate_release_notes: true
-          draft: true
-          files: |
-            app/build/outputs/apk/release/aa-torque.apk
-            app/build/outputs/mapping/release/mapping.txt
+      - name: Publish or update latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          APK="app/build/outputs/apk/release/aa-torque.apk"
+          MAPPING="app/build/outputs/mapping/release/mapping.txt"
+          NOTES="Automated build from ${GITHUB_SHA}"
+
+          if gh release view latest --repo "$REPO" >/dev/null 2>&1; then
+            gh release upload latest "$APK" --repo "$REPO" --clobber
+            gh release upload latest "$MAPPING" --repo "$REPO" --clobber
+            gh release edit latest \
+              --repo "$REPO" \
+              --title "latest" \
+              --notes "$NOTES" \
+              --draft=false \
+              --prerelease=false
+          else
+            gh release create latest "$APK" "$MAPPING" \
+              --repo "$REPO" \
+              --title "latest" \
+              --notes "$NOTES" \
+              --latest
+          fi
