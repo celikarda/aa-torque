@@ -19,11 +19,10 @@
 
     <TextView
         android:id="@+id/valueElement"
-        android:layout_width="wrap_content"
+        android:layout_width="76dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:gravity="start"
         android:maxLines="1"
-        android:minWidth="56dp"
         android:text="@{value}"
         android:textColor="@android:color/white"
         android:textSize="13sp"
