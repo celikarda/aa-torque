@@ -7,7 +7,10 @@
             name="binding"
             type="com.aatorque.stats.TorqueChart.LegendBinding" />
         <variable
-            name="font"
+            name="mainFont"
+            type="Typeface" />
+        <variable
+            name="secondaryFont"
             type="Typeface" />
     </data>
 
@@ -34,7 +37,7 @@
             android:gravity="center_vertical"
             android:maxLines="1"
             android:ellipsize="marquee"
-            android:typeface="@{font}"
+            android:typeface="@{mainFont}"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -47,7 +50,7 @@
             android:minWidth="150dp"
             android:layout_weight="1"
             android:maxLines="1"
-            android:typeface="@{font}"
+            android:typeface="@{secondaryFont}"
             />
     </androidx.appcompat.widget.LinearLayoutCompat>
 </layout>

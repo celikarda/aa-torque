@@ -5,7 +5,7 @@
         <import type="android.view.View" />
 
         <variable
-            name="font"
+            name="secondaryFont"
             type="Typeface" />
 
         <variable
@@ -26,6 +26,6 @@
         android:text="@{value}"
         android:textColor="@android:color/white"
         android:textSize="13sp"
-        android:typeface="@{font}"
+        android:typeface="@{secondaryFont}"
         android:visibility="@{visible ? View.VISIBLE : View.INVISIBLE}" />
 </layout>

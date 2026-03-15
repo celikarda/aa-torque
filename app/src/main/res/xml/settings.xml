@@ -18,7 +18,16 @@
             android:entries="@array/fontEntries"
             android:entryValues="@array/fontValues"
             android:key="selectedFont"
-            android:title="@string/pref_font"
+            android:title="@string/pref_main_font"
+            app:entryImages="@array/FontThumbs"
+            android:persistent="false"
+            app:tint="@color/tintColor"
+        />
+        <com.aatorque.prefs.ImageListPreference
+            android:entries="@array/fontEntries"
+            android:entryValues="@array/fontValues"
+            android:key="selectedSecondaryFont"
+            android:title="@string/pref_secondary_font"
             app:entryImages="@array/FontThumbs"
             android:persistent="false"
             app:tint="@color/tintColor"

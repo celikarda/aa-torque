@@ -3,11 +3,13 @@
     <string-array name="dashboard_style_entries">
         <item>Classic</item>
         <item>Dense</item>
+        <item>GR Dash</item>
     </string-array>
 
     <string-array name="dashboard_style_values" translatable="false">
         <item>classic</item>
         <item>dense</item>
+        <item>gr</item>
     </string-array>
 
     <!-- List of themes, used in settings -->

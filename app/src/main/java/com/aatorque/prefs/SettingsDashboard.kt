@@ -25,15 +25,22 @@ class SettingsDashboard : PreferenceFragmentCompat() {
     lateinit var optionsCat: PreferenceCategory
 
     private fun gaugeTitle(style: DashboardStyle, index: Int): String {
-        return if (style == DashboardStyle.CLASSIC) {
-            when (index) {
+        return when (style) {
+            DashboardStyle.CLASSIC -> when (index) {
                 0 -> getString(R.string.pref_leftclock)
                 1 -> getString(R.string.pref_centerclock)
                 2 -> getString(R.string.pref_rightclock)
                 else -> "Gauge ${index + 1}"
             }
-        } else {
-            "Gauge ${index + 1}"
+
+            DashboardStyle.GR -> arrayOf(
+                "Top Left Gauge",
+                "Top Right Gauge",
+                "Bottom Left Gauge",
+                "Bottom Right Gauge",
+            ).getOrElse(index) { "Gauge ${index + 1}" }
+
+            DashboardStyle.DENSE -> "Gauge ${index + 1}"
         }
     }
 
@@ -93,6 +100,7 @@ class SettingsDashboard : PreferenceFragmentCompat() {
 
                             performanceTitle.text = screen.title
                             performanceTitle.title = resources.getString(R.string.pref_title_performance, dbIndex + 1)
+                            performanceTitle.isVisible = style == DashboardStyle.CLASSIC
                             stylePreference.value = style.prefValue
                             optionsCat.removeAll()
 
@@ -108,6 +116,7 @@ class SettingsDashboard : PreferenceFragmentCompat() {
                                         it.icon = AppCompatResources.getDrawable(requireContext(), gaugeIcon(i))
                                         DrawableCompat.setTint(it.icon!!, resources.getColor(R.color.tintColor, requireContext().theme))
                                         it.fragment = SettingsPIDFragment::class.java.canonicalName
+                                        it.extras.putString("dashboardStyle", style.prefValue)
                                     }
                                 )
                             }
@@ -124,6 +133,7 @@ class SettingsDashboard : PreferenceFragmentCompat() {
                                         it.icon = AppCompatResources.getDrawable(requireContext(), displayIcon(style, i))
                                         DrawableCompat.setTint(it.icon!!, resources.getColor(R.color.tintColor, requireContext().theme))
                                         it.fragment = SettingsPIDFragment::class.java.canonicalName
+                                        it.extras.putString("dashboardStyle", style.prefValue)
                                     }
                                 )
                             }

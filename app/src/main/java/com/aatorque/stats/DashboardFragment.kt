@@ -71,6 +71,12 @@ open class DashboardFragment : AlbumArt() {
         R.id.gauge5,
         R.id.gauge6,
     )
+    private val grGaugeIds = intArrayOf(
+        R.id.grGauge1,
+        R.id.grGauge2,
+        R.id.grGauge3,
+        R.id.grGauge4,
+    )
     private val classicDisplayIds = intArrayOf(
         R.id.classicDisplay1,
         R.id.classicDisplay2,
@@ -87,17 +93,30 @@ open class DashboardFragment : AlbumArt() {
         R.id.display7,
         R.id.display8,
     )
+    private val grDisplayIds = intArrayOf(
+        R.id.grDisplay1,
+        R.id.grDisplay2,
+        R.id.grDisplay3,
+        R.id.grDisplay4,
+        R.id.grDisplay5,
+        R.id.grDisplay6,
+        R.id.grDisplay7,
+        R.id.grDisplay8,
+    )
 
     private val hiddenGauge = Display.newBuilder().setDisabled(true).build()
     private val hiddenDisplay = Display.newBuilder().setDisabled(true).build()
 
     private var classicGauges = arrayOfNulls<TorqueGauge>(classicGaugeIds.size)
     private var denseGauges = arrayOfNulls<MiniTorqueGauge>(denseGaugeIds.size)
+    private var grGauges = arrayOfNulls<GrTorqueGauge>(grGaugeIds.size)
     private var classicDisplays = arrayOfNulls<TorqueDisplay>(classicDisplayIds.size)
     private var denseDisplays = arrayOfNulls<TyreValueDisplay>(denseDisplayIds.size)
+    private var grDisplays = arrayOfNulls<TyreValueDisplay>(grDisplayIds.size)
 
     private var screensAnimating = false
     private var mStarted = false
+    private var currentStyle = DashboardStyle.CLASSIC
     lateinit var binding: FragmentDashboardBinding
     lateinit var torqueChart: TorqueChart
     lateinit var settingsViewModel: SettingsViewModel
@@ -142,7 +161,11 @@ open class DashboardFragment : AlbumArt() {
             data -> data.map {
                 it.selectedBackground
             }.distinctUntilChanged().collect {
-                setupBackground(it)
+                if (currentStyle == DashboardStyle.GR) {
+                    setupBackground(R.drawable.background_incar_black)
+                } else {
+                    setupBackground(it)
+                }
                 albumArtReady.countDown()
             }
         }
@@ -151,17 +174,31 @@ open class DashboardFragment : AlbumArt() {
                 val screenIndex = abs(it.currentScreen) % it.screensCount
                 val screens = it.screensList[screenIndex]
                 val style = styleFromScreen(screens)
+                currentStyle = style
                 val isDense = style == DashboardStyle.DENSE
-                val activeGaugeCount = if (isDense) denseGaugeIds.size else classicGaugeIds.size
-                val activeDisplayCount = if (isDense) denseDisplayIds.size else classicDisplayIds.size
+                val isGr = style == DashboardStyle.GR
+                val activeGaugeCount = when (style) {
+                    DashboardStyle.CLASSIC -> classicGaugeIds.size
+                    DashboardStyle.DENSE -> denseGaugeIds.size
+                    DashboardStyle.GR -> grGaugeIds.size
+                }
+                val activeDisplayCount = when (style) {
+                    DashboardStyle.CLASSIC -> classicDisplayIds.size
+                    DashboardStyle.DENSE -> denseDisplayIds.size
+                    DashboardStyle.GR -> grDisplayIds.size
+                }
                 val displayOffset = activeGaugeCount
                 val showChartChanged = binding.showChart != it.showChart
                 binding.title = screens.title
                 binding.showBtns = false
                 binding.denseStyle = isDense
+                binding.grStyle = isGr
                 settingsViewModel.chartVisible.value = it.showChart
                 settingsViewModel.minMaxBelow.value = it.minMaxBelow
-                shouldDisplayArtwork = it.albumArt
+                shouldDisplayArtwork = it.albumArt && style != DashboardStyle.GR
+                if (style == DashboardStyle.GR) {
+                    setupBackground(R.drawable.background_incar_black)
+                }
 
                 albumArtReady.countDown()
 
@@ -175,18 +212,18 @@ open class DashboardFragment : AlbumArt() {
                     screens.gaugesList.take(activeGaugeCount).forEachIndexed { index, display ->
                         if (showChartChanged || torqueRefresher.hasChanged(index, display)) {
                             val clock = torqueRefresher.populateQuery(index, screenIndex, display)
-                            setupGauge(isDense, index, clock)
+                            setupGauge(style, index, clock)
                         }
                     }
                     for (index in screens.gaugesList.size until activeGaugeCount) {
                         if (showChartChanged || torqueRefresher.hasChanged(index, hiddenGauge)) {
                             val hidden = torqueRefresher.populateQuery(index, screenIndex, hiddenGauge)
-                            setupGauge(isDense, index, hidden)
+                            setupGauge(style, index, hidden)
                         }
                     }
                 }
                 screens.displaysList.take(activeDisplayCount).forEachIndexed { index, display ->
-                    val adjustedDisplay = if (isDense) {
+                    val adjustedDisplay = if (style != DashboardStyle.CLASSIC) {
                         display.toBuilder().setShowLabel(false).setIcon("ic_none").build()
                     } else {
                         display
@@ -197,14 +234,14 @@ open class DashboardFragment : AlbumArt() {
                             screenIndex,
                             adjustedDisplay
                         )
-                        setupDisplay(isDense, index, td)
+                        setupDisplay(style, index, td)
                     }
                 }
                 for (index in screens.displaysList.size until activeDisplayCount) {
                     val pos = index + displayOffset
                     if (torqueRefresher.hasChanged(pos, hiddenDisplay)) {
                         val hidden = torqueRefresher.populateQuery(pos, screenIndex, hiddenDisplay)
-                        setupDisplay(isDense, index, hidden)
+                        setupDisplay(style, index, hidden)
                     }
                 }
                 torqueRefresher.makeExecutors(torqueService)
@@ -214,7 +251,7 @@ open class DashboardFragment : AlbumArt() {
             data -> data.map {
                 it.opacity
             }.distinctUntilChanged().collect {
-                binding.gaugeAlpha = if (it == 0) 1f else 0.01f * it
+                binding.gaugeAlpha = if (currentStyle == DashboardStyle.GR || it == 0) 1f else 0.01f * it
             }
         }
         registerWithView {
@@ -248,7 +285,14 @@ open class DashboardFragment : AlbumArt() {
             data -> data.map {
                 it.selectedFont
             }.distinctUntilChanged().collect(
-                this@DashboardFragment::setupTypeface
+                this@DashboardFragment::setupMainTypeface
+            )
+        }
+        registerWithView {
+            data -> data.map {
+                if (it.selectedSecondaryFont.isBlank()) it.selectedFont else it.selectedSecondaryFont
+            }.distinctUntilChanged().collect(
+                this@DashboardFragment::setupSecondaryTypeface
             )
         }
         registerWithView {
@@ -277,7 +321,7 @@ open class DashboardFragment : AlbumArt() {
         Timber.i("onCreateView")
         binding = FragmentDashboardBinding.inflate(inflater, container, false)
 
-        settingsViewModel.typefaceLiveData.observe(viewLifecycleOwner) {
+        settingsViewModel.mainTypefaceLiveData.observe(viewLifecycleOwner) {
             binding.font = it
         }
         settingsViewModel.chartVisible.observe(viewLifecycleOwner) {
@@ -304,11 +348,17 @@ open class DashboardFragment : AlbumArt() {
         denseGaugeIds.forEachIndexed { index, id ->
             denseGauges[index] = childFragmentManager.findFragmentById(id) as MiniTorqueGauge
         }
+        grGaugeIds.forEachIndexed { index, id ->
+            grGauges[index] = childFragmentManager.findFragmentById(id) as GrTorqueGauge
+        }
         classicDisplayIds.forEachIndexed { index, id ->
             classicDisplays[index] = childFragmentManager.findFragmentById(id) as TorqueDisplay
         }
         denseDisplayIds.forEachIndexed { index, id ->
             denseDisplays[index] = childFragmentManager.findFragmentById(id) as TyreValueDisplay
+        }
+        grDisplayIds.forEachIndexed { index, id ->
+            grDisplays[index] = childFragmentManager.findFragmentById(id) as TyreValueDisplay
         }
         torqueChart = childFragmentManager.findFragmentById(R.id.chartFrag)!! as TorqueChart
         val filter = IntentFilter().apply { addAction("KEY_DOWN") }
@@ -416,19 +466,19 @@ open class DashboardFragment : AlbumArt() {
         })
     }
 
-    private fun setupGauge(isDense: Boolean, index: Int, clock: TorqueData) {
-        if (isDense) {
-            denseGauges.getOrNull(index)?.setupClock(clock)
-        } else {
-            classicGauges.getOrNull(index)?.setupClock(clock)
+    private fun setupGauge(style: DashboardStyle, index: Int, clock: TorqueData) {
+        when (style) {
+            DashboardStyle.CLASSIC -> classicGauges.getOrNull(index)?.setupClock(clock)
+            DashboardStyle.DENSE -> denseGauges.getOrNull(index)?.setupClock(clock)
+            DashboardStyle.GR -> grGauges.getOrNull(index)?.setupClock(clock)
         }
     }
 
-    private fun setupDisplay(isDense: Boolean, index: Int, data: TorqueData) {
-        if (isDense) {
-            denseDisplays.getOrNull(index)?.setupElement(data)
-        } else {
-            classicDisplays.getOrNull(index)?.setupElement(data)
+    private fun setupDisplay(style: DashboardStyle, index: Int, data: TorqueData) {
+        when (style) {
+            DashboardStyle.CLASSIC -> classicDisplays.getOrNull(index)?.setupElement(data)
+            DashboardStyle.DENSE -> denseDisplays.getOrNull(index)?.setupElement(data)
+            DashboardStyle.GR -> grDisplays.getOrNull(index)?.setupElement(data)
         }
     }
 
@@ -520,9 +570,9 @@ open class DashboardFragment : AlbumArt() {
         }
     }
 
-    fun setupTypeface(selectedFont: String) {
+    private fun fontForSelection(selectedFont: String): Int {
         Timber.d("font: $selectedFont")
-        val font = when (selectedFont) {
+        return when (selectedFont) {
             "segments" -> R.font.digital
             "seat" -> R.font.seat_metastyle_monodigit_regular
             "audi" -> R.font.auditypedisplayhigh
@@ -546,7 +596,14 @@ open class DashboardFragment : AlbumArt() {
             "orbitron" -> R.font.orbitron
             else -> R.font.digital
         }
-        settingsViewModel.setFont(font)
+    }
+
+    fun setupMainTypeface(selectedFont: String) {
+        settingsViewModel.setMainFont(fontForSelection(selectedFont))
+    }
+
+    fun setupSecondaryTypeface(selectedFont: String) {
+        settingsViewModel.setSecondaryFont(fontForSelection(selectedFont))
     }
 
 

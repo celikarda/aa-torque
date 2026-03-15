@@ -64,6 +64,8 @@
     <string name="pref_appearance">Appearance</string>
     <string name="pref_centerclock">Center gauges</string>
     <string name="pref_font">Font</string>
+    <string name="pref_main_font">Main font</string>
+    <string name="pref_secondary_font">Secondary font</string>
     <string name="pref_highlow">Show min/max values</string>
     <string name="pref_highlowmarks">Mark highest values on the gauge</string>
     <string name="pref_highvis">High visibility dial</string>

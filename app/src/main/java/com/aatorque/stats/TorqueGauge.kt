@@ -71,7 +71,8 @@ class TorqueGauge : Fragment() {
     ): View? {
         Timber.i("onCreateView")
         binding = FragmentGaugeBinding.inflate(inflater, container, false)
-        settingsViewModel.typefaceLiveData.observe(viewLifecycleOwner, this::setupTypeface)
+        settingsViewModel.mainTypefaceLiveData.observe(viewLifecycleOwner, this::setupMainTypeface)
+        settingsViewModel.secondaryTypefaceLiveData.observe(viewLifecycleOwner, this::setupSecondaryTypeface)
         settingsViewModel.minMaxBelow.observe(viewLifecycleOwner) {
             binding.minMaxBelow = it
         }
@@ -136,8 +137,12 @@ class TorqueGauge : Fragment() {
         mRayClock.invalidate()
     }
 
-    fun setupTypeface(typeface: Typeface) {
-        binding.font = typeface
+    fun setupMainTypeface(typeface: Typeface) {
+        binding.mainFont = typeface
+    }
+
+    fun setupSecondaryTypeface(typeface: Typeface) {
+        binding.secondaryFont = typeface
     }
 
     fun turnMinMaxMarksEnabled(enabled: MaxControl) {

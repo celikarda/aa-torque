@@ -309,6 +309,7 @@ class SettingsActivity : AppCompatActivity(),
         // Instantiate the new Fragment
         val args = Bundle()
         args.putCharSequence("title", pref.title)
+        args.putString("dashboardStyle", pref.extras.getString("dashboardStyle"))
         val prefix = pref.extras.getString("prefix") ?: pref.key
         if (prefix.startsWith("clock_") || prefix.startsWith("display")) {
             val parts = prefix.split("_")
@@ -437,4 +438,3 @@ class SettingsActivity : AppCompatActivity(),
         const val EXPORT_MIME = "application/octet-stream"
     }
 }
-

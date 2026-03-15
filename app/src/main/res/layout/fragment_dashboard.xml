@@ -60,6 +60,10 @@
         <variable
             name="denseStyle"
             type="Boolean" />
+
+        <variable
+            name="grStyle"
+            type="Boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -100,7 +104,7 @@
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:typeface="@{font}"
-                android:visibility="@{status == 0 ? View.INVISIBLE : View.VISIBLE}"
+                android:visibility="@{status == 0 ? View.GONE : View.VISIBLE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -116,6 +120,7 @@
                 android:textColor="@android:color/white"
                 android:textSize="30sp"
                 android:typeface="@{font}"
+                android:visibility="@{denseStyle || grStyle ? View.GONE : View.VISIBLE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/con_status" />
@@ -194,7 +199,7 @@
                     android:id="@+id/classicLayout"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:visibility="@{!showChart &amp;&amp; !denseStyle ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{!showChart &amp;&amp; !denseStyle &amp;&amp; !grStyle ? View.VISIBLE : View.GONE}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -548,6 +553,271 @@
                                 android:layout_height="wrap_content"
                                 android:layout="@layout/fragment_tyre_value" />
                         </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/grLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="@{!showChart &amp;&amp; grStyle ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/grLeftSplit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.297" />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/grRightSplit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.703" />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/grMidHorizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layout_constraintGuide_percent="0.5" />
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/grGauge1"
+                        android:name="com.aatorque.stats.GrTorqueGauge"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout="@layout/fragment_gr_gauge"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_marginBottom="6dp"
+                        app:alpha="@{gaugeAlpha}"
+                        app:layout_constraintBottom_toTopOf="@id/grMidHorizontal"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintEnd_toStartOf="@id/grLeftSplit"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/grGauge2"
+                        android:name="com.aatorque.stats.GrTorqueGauge"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout="@layout/fragment_gr_gauge"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_marginBottom="6dp"
+                        app:alpha="@{gaugeAlpha}"
+                        app:layout_constraintBottom_toTopOf="@id/grMidHorizontal"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/grRightSplit"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/grGauge3"
+                        android:name="com.aatorque.stats.GrTorqueGauge"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout="@layout/fragment_gr_gauge"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_marginBottom="6dp"
+                        app:alpha="@{gaugeAlpha}"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintEnd_toStartOf="@id/grLeftSplit"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/grMidHorizontal" />
+
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/grGauge4"
+                        android:name="com.aatorque.stats.GrTorqueGauge"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout="@layout/fragment_gr_gauge"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_marginBottom="6dp"
+                        app:alpha="@{gaugeAlpha}"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/grRightSplit"
+                        app:layout_constraintTop_toBottomOf="@id/grMidHorizontal" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/grCenterPanel"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/grRightSplit"
+                        app:layout_constraintStart_toEndOf="@id/grLeftSplit"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <LinearLayout
+                            android:id="@+id/grTyreInfo"
+                            android:layout_width="300dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_bias="0.53">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <androidx.fragment.app.FragmentContainerView
+                                    android:id="@+id/grDisplay1"
+                                    android:name="com.aatorque.stats.TyreValueDisplay"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout="@layout/fragment_tyre_value" />
+
+                                <Space
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="1" />
+
+                                <androidx.fragment.app.FragmentContainerView
+                                    android:id="@+id/grDisplay3"
+                                    android:name="com.aatorque.stats.TyreValueDisplay"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout="@layout/fragment_tyre_value" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="6dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginBottom="10dp"
+                                android:background="#6E0000" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <androidx.fragment.app.FragmentContainerView
+                                    android:id="@+id/grDisplay2"
+                                    android:name="com.aatorque.stats.TyreValueDisplay"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout="@layout/fragment_tyre_value" />
+
+                                <Space
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="1" />
+
+                                <androidx.fragment.app.FragmentContainerView
+                                    android:id="@+id/grDisplay4"
+                                    android:name="com.aatorque.stats.TyreValueDisplay"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout="@layout/fragment_tyre_value" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="20dp"
+                                android:orientation="horizontal">
+
+                                <androidx.fragment.app.FragmentContainerView
+                                    android:id="@+id/grDisplay5"
+                                    android:name="com.aatorque.stats.TyreValueDisplay"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout="@layout/fragment_tyre_value" />
+
+                                <Space
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="1" />
+
+                                <androidx.fragment.app.FragmentContainerView
+                                    android:id="@+id/grDisplay7"
+                                    android:name="com.aatorque.stats.TyreValueDisplay"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout="@layout/fragment_tyre_value" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="6dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginBottom="10dp"
+                                android:background="#6E0000" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <androidx.fragment.app.FragmentContainerView
+                                    android:id="@+id/grDisplay6"
+                                    android:name="com.aatorque.stats.TyreValueDisplay"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout="@layout/fragment_tyre_value" />
+
+                                <Space
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="1" />
+
+                                <androidx.fragment.app.FragmentContainerView
+                                    android:id="@+id/grDisplay8"
+                                    android:name="com.aatorque.stats.TyreValueDisplay"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout="@layout/fragment_tyre_value" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/grCarOutline"
+                            android:layout_width="200dp"
+                            android:layout_height="99dp"
+                            android:alpha="0.95"
+                            android:elevation="2dp"
+                            android:rotation="90"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/gry_topdown"
+                            app:layout_constraintBottom_toBottomOf="@id/grTyreInfo"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@id/grTyreInfo" />
+
+                        <ImageView
+                            android:id="@+id/grLogo"
+                            android:layout_width="96dp"
+                            android:layout_height="47dp"
+                            android:layout_marginBottom="33dp"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/gr_logo"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 

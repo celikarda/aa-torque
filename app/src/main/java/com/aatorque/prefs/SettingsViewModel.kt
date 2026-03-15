@@ -8,15 +8,24 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
-    private val selectedFont = MutableLiveData<Int>()
+    private val selectedMainFont = MutableLiveData<Int>()
+    private val selectedSecondaryFont = MutableLiveData<Int>()
     val chartVisible = MutableLiveData<Boolean>()
     val minMaxBelow = MutableLiveData<Boolean>()
 
-    val typefaceLiveData = selectedFont.map {
+    val mainTypefaceLiveData = selectedMainFont.map {
         return@map ResourcesCompat.getFont(getApplication(), it)!!
     }
 
-    fun setFont(@FontRes font: Int) {
-        selectedFont.value = font
+    val secondaryTypefaceLiveData = selectedSecondaryFont.map {
+        return@map ResourcesCompat.getFont(getApplication(), it)!!
+    }
+
+    fun setMainFont(@FontRes font: Int) {
+        selectedMainFont.value = font
+    }
+
+    fun setSecondaryFont(@FontRes font: Int) {
+        selectedSecondaryFont.value = font
     }
 }

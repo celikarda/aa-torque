@@ -38,7 +38,8 @@ class MiniTorqueGauge : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentMiniGaugeBinding.inflate(inflater, container, false)
-        settingsViewModel.typefaceLiveData.observe(viewLifecycleOwner, this::setupTypeface)
+        settingsViewModel.mainTypefaceLiveData.observe(viewLifecycleOwner, this::setupMainTypeface)
+        settingsViewModel.secondaryTypefaceLiveData.observe(viewLifecycleOwner, this::setupSecondaryTypeface)
         return binding.root
     }
 
@@ -62,8 +63,11 @@ class MiniTorqueGauge : Fragment() {
         mMax.addSections(Section(0f, 1f, Color.TRANSPARENT))
     }
 
-    private fun setupTypeface(typeface: Typeface) {
-        binding.font = typeface
+    private fun setupMainTypeface(typeface: Typeface) {
+        binding.mainFont = typeface
+    }
+
+    private fun setupSecondaryTypeface(typeface: Typeface) {
         mClock.speedTextTypeface = typeface
         mClock.textTypeface = typeface
         mMax.speedTextTypeface = typeface

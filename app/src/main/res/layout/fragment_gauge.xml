@@ -23,7 +23,11 @@
         <import type="android.graphics.drawable.Drawable" />
 
         <variable
-            name="font"
+            name="mainFont"
+            type="Typeface" />
+
+        <variable
+            name="secondaryFont"
             type="Typeface" />
 
         <variable
@@ -107,7 +111,7 @@
             android:textAlignment="center"
             android:textColor="@android:color/white"
                 android:textSize="18sp"
-                android:typeface="@{font}"
+                android:typeface="@{secondaryFont}"
                 android:visibility="@{showLimitBelow == MaxControl.OFF ? View.INVISIBLE : View.VISIBLE}"
                 app:layout_constraintHeight="true"
                 app:layout_constrainedHeight="true"
@@ -128,7 +132,7 @@
                 android:textAlignment="gravity"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
-                android:typeface="@{font}"
+                android:typeface="@{mainFont}"
                 app:layout_constrainedWidth="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -148,14 +152,14 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textTitle"
-                app:speedTextTypeface="@{font}"
+                app:speedTextTypeface="@{secondaryFont}"
                 app:sv_speedTextSize="24dp"
                 app:sv_textColor="@android:color/white"
                 app:sv_unit=""
                 app:sv_unitSpeedInterval="5dp"
                 app:sv_unitTextSize="14sp"
                 app:minMax="@{minMax}"
-                app:textTypeface="@{font}"
+                app:textTypeface="@{secondaryFont}"
                 app:tickNumber="@{ticksOn ? TorqueGaugeKt.NUM_TICKS : 0}"
                 app:onPrintTickLabel="@{ tickFormatter }"
                 app:wholeNumbers="@{wholeNumbers}"

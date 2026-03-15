@@ -36,6 +36,7 @@ class SettingsPIDFragment:  PreferenceFragmentCompat() {
     var isClock = true
     var screen = 0
     var index = 0
+    var isGrDash = false
 
     lateinit var display: Display
     lateinit var enabledPref: SwitchPreferenceCompat
@@ -91,6 +92,7 @@ class SettingsPIDFragment:  PreferenceFragmentCompat() {
         isClock = args.getBoolean("isClock")
         screen = args.getInt("screen")
         index = args.getInt("index")
+        isGrDash = DashboardStyle.fromPref(args.getString("dashboardStyle")) == DashboardStyle.GR
         preferenceManager.sharedPreferencesName = null
 
         enabledPref = findPreference("enabled")!!
@@ -171,6 +173,21 @@ class SettingsPIDFragment:  PreferenceFragmentCompat() {
             return@setOnPreferenceChangeListener true
         }
 
+        if (isGrDash) {
+            showLabelPref.isVisible = false
+            labelPref.isVisible = false
+            imagePref.isVisible = false
+            minValuePref.isVisible = false
+            maxValuePref.isVisible = false
+            unitPref.isVisible = false
+            runcustomScriptPref.isVisible = false
+            jsPref.isVisible = false
+            wholeNumberPref.isVisible = false
+            gaugeSettings.isVisible = false
+            colorPref.isVisible = false
+            highVisActivePref.isVisible = false
+        }
+
         lifecycleScope.launch {
             requireContext().dataStore.data.map {
                 val screen = it.getScreens(screen)
@@ -234,6 +251,33 @@ class SettingsPIDFragment:  PreferenceFragmentCompat() {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun saveState() {
+        if (isGrDash) {
+            val context = requireContext()
+            GlobalScope.launch(Dispatchers.IO) {
+                context.dataStore.updateData {
+                        currentSettings ->
+                    return@updateData currentSettings.toBuilder().let { set1 ->
+                        var screenObj: Screen.Builder = try {
+                            set1.getScreens(screen).toBuilder()
+                        } catch (e: IndexOutOfBoundsException) {
+                            Screen.newBuilder()
+                        }
+                        val updated = display.toBuilder()
+                            .setDisabled(!enabledPref.isChecked)
+                            .setPid(pidPref.value)
+                            .build()
+                        screenObj = if (isClock) {
+                            screenObj.setGauges(index, updated)
+                        } else {
+                            screenObj.setDisplays(index, updated)
+                        }
+                        set1.setScreens(screen, screenObj)
+                    }.build()
+                }
+            }
+            return
+        }
+
         fun coerce(value: String?, default: Int): Int {
             return try {
                 value?.toInt() ?: default

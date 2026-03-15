@@ -16,8 +16,11 @@ class LegendAdapter(private var settingsViewModel: SettingsViewModel, var items:
             binding.binding = data
             // make sure to include this so your view will be updated
             binding.executePendingBindings()
-            vm.typefaceLiveData.observe(binding.lifecycleOwner!!) {
-                binding.font = it
+            vm.mainTypefaceLiveData.observe(binding.lifecycleOwner!!) {
+                binding.mainFont = it
+            }
+            vm.secondaryTypefaceLiveData.observe(binding.lifecycleOwner!!) {
+                binding.secondaryFont = it
             }
         }
         companion object {

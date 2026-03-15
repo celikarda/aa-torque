@@ -15,11 +15,16 @@ import java.io.OutputStream
 
 enum class DashboardStyle(val prefValue: String) {
     CLASSIC("classic"),
-    DENSE("dense");
+    DENSE("dense"),
+    GR("gr");
 
     companion object {
         fun fromPref(value: String?): DashboardStyle {
-            return if (value == DENSE.prefValue) DENSE else CLASSIC
+            return when (value) {
+                DENSE.prefValue -> DENSE
+                GR.prefValue -> GR
+                else -> CLASSIC
+            }
         }
     }
 }
@@ -28,6 +33,8 @@ const val CLASSIC_GAUGE_SLOTS = 3
 const val CLASSIC_DISPLAY_SLOTS = 4
 const val DENSE_GAUGE_SLOTS = 6
 const val DENSE_DISPLAY_SLOTS = 8
+const val GR_GAUGE_SLOTS = 4
+const val GR_DISPLAY_SLOTS = 8
 
 private fun gaugeDefaults(index: Int): Display {
     return when (index) {
@@ -228,35 +235,41 @@ private fun classicDisplayDefaults(index: Int): Display {
 }
 
 fun styleFromScreen(screen: Screen): DashboardStyle {
-    return if (
-        screen.gaugesCount >= DENSE_GAUGE_SLOTS ||
-        screen.displaysCount >= DENSE_DISPLAY_SLOTS
-    ) {
-        DashboardStyle.DENSE
-    } else {
-        DashboardStyle.CLASSIC
+    return when {
+        screen.gaugesCount >= DENSE_GAUGE_SLOTS -> DashboardStyle.DENSE
+        screen.gaugesCount >= GR_GAUGE_SLOTS && screen.displaysCount >= GR_DISPLAY_SLOTS -> DashboardStyle.GR
+        else -> DashboardStyle.CLASSIC
     }
 }
 
 fun slotsForStyle(style: DashboardStyle): Pair<Int, Int> {
-    return if (style == DashboardStyle.DENSE) {
-        DENSE_GAUGE_SLOTS to DENSE_DISPLAY_SLOTS
-    } else {
-        CLASSIC_GAUGE_SLOTS to CLASSIC_DISPLAY_SLOTS
+    return when (style) {
+        DashboardStyle.DENSE -> DENSE_GAUGE_SLOTS to DENSE_DISPLAY_SLOTS
+        DashboardStyle.GR -> GR_GAUGE_SLOTS to GR_DISPLAY_SLOTS
+        DashboardStyle.CLASSIC -> CLASSIC_GAUGE_SLOTS to CLASSIC_DISPLAY_SLOTS
     }
 }
 
 private fun gaugeForStyle(index: Int): Display = gaugeDefaults(index)
 
 private fun displayForStyle(style: DashboardStyle, index: Int): Display {
-    return if (style == DashboardStyle.DENSE) denseDisplayDefaults(index) else classicDisplayDefaults(index)
+    return when (style) {
+        DashboardStyle.DENSE, DashboardStyle.GR -> denseDisplayDefaults(index)
+        DashboardStyle.CLASSIC -> classicDisplayDefaults(index)
+    }
 }
 
 fun normalizeScreen(screen: Screen, style: DashboardStyle = styleFromScreen(screen)): Screen {
     val (gaugeSlots, displaySlots) = slotsForStyle(style)
     val builder = screen.toBuilder().clearGauges().clearDisplays()
     if (screen.title.isBlank()) {
-        builder.setTitle(if (style == DashboardStyle.DENSE) "Special Dash" else "Performance")
+        builder.setTitle(
+            when (style) {
+                DashboardStyle.DENSE -> "Special Dash"
+                DashboardStyle.GR -> "GR Dash"
+                DashboardStyle.CLASSIC -> "Performance"
+            }
+        )
     }
 
     for (i in 0 until gaugeSlots) {
@@ -276,6 +289,12 @@ fun applyStyle(screen: Screen, style: DashboardStyle): Screen {
 
 fun normalizePreference(pref: UserPreference): UserPreference {
     val builder = pref.toBuilder().clearScreens()
+    if (builder.selectedFont.isBlank()) {
+        builder.selectedFont = "ev"
+    }
+    if (builder.selectedSecondaryFont.isBlank()) {
+        builder.selectedSecondaryFont = builder.selectedFont
+    }
     if (pref.screensCount == 0) {
         builder.addScreens(normalizeScreen(Screen.newBuilder().setTitle("Performance").build(), DashboardStyle.CLASSIC))
         return builder.build()
@@ -294,6 +313,7 @@ object UserPreferenceSerializer : Serializer<UserPreference> {
         .addScreens(defaultScreen)
         .setSelectedTheme("Electro Vehicle")
         .setSelectedFont("ev")
+        .setSelectedSecondaryFont("ev")
         .setSelectedBackground("background_incar_black")
         .setCenterGaugeLarge(false)
         .build()

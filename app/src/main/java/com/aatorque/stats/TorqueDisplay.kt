@@ -42,7 +42,8 @@ class TorqueDisplay : Fragment() {
     ): View {
         Timber.i("onCreateView")
         binding = FragmentDisplayBinding.inflate(inflater, container, false)
-        settingsViewModel.typefaceLiveData.observe(viewLifecycleOwner, this::setupTypeface)
+        settingsViewModel.mainTypefaceLiveData.observe(viewLifecycleOwner, this::setupMainTypeface)
+        settingsViewModel.secondaryTypefaceLiveData.observe(viewLifecycleOwner, this::setupSecondaryTypeface)
         rootView = binding.root
         bottomBacking.observeForever {
             binding.showBottom = it
@@ -88,8 +89,12 @@ class TorqueDisplay : Fragment() {
         alarmObserver.bind(viewLifecycleOwner, data.currentAlarm)
     }
 
-    fun setupTypeface(typeface: Typeface) {
-        binding.font = typeface
+    fun setupMainTypeface(typeface: Typeface) {
+        binding.mainFont = typeface
+    }
+
+    fun setupSecondaryTypeface(typeface: Typeface) {
+        binding.secondaryFont = typeface
     }
 
     @SuppressLint("SetTextI18n")

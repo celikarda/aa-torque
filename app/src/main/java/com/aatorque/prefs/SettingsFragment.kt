@@ -30,7 +30,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
     lateinit var dashboardsCat: PreferenceCategory
     lateinit var backgroundPref: ImageListPreference
     lateinit var themePref: ImageListPreference
-    lateinit var fontPref: ImageListPreference
+    lateinit var mainFontPref: ImageListPreference
+    lateinit var secondaryFontPref: ImageListPreference
     lateinit var centerGaugeLargePref: CheckBoxPreference
     lateinit var minMaxBelowPref: CheckBoxPreference
     lateinit var mediaBgPref: CheckBoxPreference
@@ -45,7 +46,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         numScreensPref = findPreference("dashboardCount")!!
         backgroundPref = findPreference("selectedBackground")!!
         themePref = findPreference("selectedTheme")!!
-        fontPref = findPreference("selectedFont")!!
+        mainFontPref = findPreference("selectedFont")!!
+        secondaryFontPref = findPreference("selectedSecondaryFont")!!
         centerGaugeLargePref = findPreference("centerGaugeLarge")!!
         minMaxBelowPref = findPreference("minMaxBelow")!!
         mediaBgPref = findPreference("mediaBg")!!
@@ -53,7 +55,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         blurArtPref = findPreference("blurArtwork")!!
         darkenArtPref = findPreference("darkenArtwork")!!
         themePref.summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
-        fontPref.summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+        mainFontPref.summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+        secondaryFontPref.summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
         backgroundPref.summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
         numScreensPref.summaryProvider = EditTextPreference.SimpleSummaryProvider.getInstance()
         numScreensPref.setOnPreferenceChangeListener { _, newValue ->
@@ -88,12 +91,20 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             return@setOnPreferenceChangeListener true
         }
-        fontPref.setOnPreferenceChangeListener {
-                preference, newValue ->
+        mainFontPref.setOnPreferenceChangeListener {
+                _, newValue ->
             updateDatastorePref {
                 it.setSelectedFont(newValue as String)
             }
-            Timber.i("Setting font $newValue")
+            Timber.i("Setting main font $newValue")
+            return@setOnPreferenceChangeListener true
+        }
+        secondaryFontPref.setOnPreferenceChangeListener {
+                _, newValue ->
+            updateDatastorePref {
+                it.setSelectedSecondaryFont(newValue as String)
+            }
+            Timber.i("Setting secondary font $newValue")
             return@setOnPreferenceChangeListener true
         }
         backgroundPref.setOnPreferenceChangeListener {
@@ -161,7 +172,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         lifecycleScope.launch {
             requireContext().dataStore.data.collect {
                 themePref.value = it.selectedTheme
-                fontPref.value = it.selectedFont
+                mainFontPref.value = it.selectedFont
+                secondaryFontPref.value = if (it.selectedSecondaryFont.isBlank()) {
+                    it.selectedFont
+                } else {
+                    it.selectedSecondaryFont
+                }
                 backgroundPref.value = it.selectedBackground
                 centerGaugeLargePref.isChecked = it.centerGaugeLarge
                 minMaxBelowPref.isChecked = it.minMaxBelow

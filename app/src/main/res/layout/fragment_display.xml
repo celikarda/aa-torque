@@ -9,7 +9,8 @@
     <variable name="value" type="String"/>
     <variable name="iconText" type="String"/>
     <variable name="icon" type="Integer"/>
-    <variable name="font" type="Typeface" />
+    <variable name="mainFont" type="Typeface" />
+    <variable name="secondaryFont" type="Typeface" />
     <variable name="showBottom" type="Boolean" />
     <variable name="showSide" type="Boolean" />
 
@@ -46,7 +47,7 @@
             android:textAlignment="gravity"
             android:textColor="@android:color/white"
             android:textSize="17sp"
-            android:typeface="@{font}" />
+            android:typeface="@{secondaryFont}" />
 
     <TextView
         android:id="@+id/iconElement"
@@ -55,7 +56,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:alpha="1.0"
-        android:typeface="@{font}"
+        android:typeface="@{mainFont}"
         android:backgroundTint="@color/car_primary"
         android:ellipsize="marquee"
         android:gravity="center"
