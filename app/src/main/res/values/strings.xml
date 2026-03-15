@@ -51,6 +51,16 @@
     <string name="font_vw" translatable="false">Volkswagen CarUI</string>
     <string name="font_vw2" translatable="false">Volkswagen Thesis</string>
     <string name="font_vw3" translatable="false">VW Digit</string>
+    <string name="font_oswald" translatable="false">Oswald</string>
+    <string name="font_roboto" translatable="false">Roboto</string>
+    <string name="font_open_sans" translatable="false">Open Sans</string>
+    <string name="font_bruno_ace" translatable="false">Bruno Ace</string>
+    <string name="font_racing_sans_one" translatable="false">Racing Sans One</string>
+    <string name="font_share_tech_mono" translatable="false">Share Tech Mono</string>
+    <string name="font_michroma" translatable="false">Michroma</string>
+    <string name="font_jetbrains_mono" translatable="false">JetBrains Mono</string>
+    <string name="font_roboto_mono" translatable="false">Roboto Mono</string>
+    <string name="font_orbitron" translatable="false">Orbitron</string>
     <string name="pref_appearance">Appearance</string>
     <string name="pref_centerclock">Center gauges</string>
     <string name="pref_font">Font</string>

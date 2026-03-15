@@ -534,6 +534,16 @@ open class DashboardFragment : AlbumArt() {
             "larabie" -> R.font.larabie
             "ford" -> R.font.unitedsans
             "ev" -> R.font.ev
+            "oswald" -> R.font.oswald
+            "roboto" -> R.font.roboto
+            "open_sans" -> R.font.open_sans
+            "bruno_ace" -> R.font.bruno_ace
+            "racing_sans_one" -> R.font.racing_sans_one
+            "share_tech_mono" -> R.font.share_tech_mono
+            "michroma" -> R.font.michroma
+            "jetbrains_mono" -> R.font.jetbrains_mono
+            "roboto_mono" -> R.font.roboto_mono
+            "orbitron" -> R.font.orbitron
             else -> R.font.digital
         }
         settingsViewModel.setFont(font)

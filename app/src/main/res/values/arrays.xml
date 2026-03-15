@@ -106,7 +106,17 @@
         <item>@string/font_skoda</item>
         <item>@string/font_larabie</item>
         <item>@string/font_ford</item>
-	<item>@string/font_ev</item>
+        <item>@string/font_ev</item>
+        <item>@string/font_oswald</item>
+        <item>@string/font_roboto</item>
+        <item>@string/font_open_sans</item>
+        <item>@string/font_bruno_ace</item>
+        <item>@string/font_racing_sans_one</item>
+        <item>@string/font_share_tech_mono</item>
+        <item>@string/font_michroma</item>
+        <item>@string/font_jetbrains_mono</item>
+        <item>@string/font_roboto_mono</item>
+        <item>@string/font_orbitron</item>
     </string-array>
 
     <string-array name="fontValues">
@@ -121,6 +131,16 @@
         <item>larabie</item>
         <item>ford</item>
         <item>ev</item>
+        <item>oswald</item>
+        <item>roboto</item>
+        <item>open_sans</item>
+        <item>bruno_ace</item>
+        <item>racing_sans_one</item>
+        <item>share_tech_mono</item>
+        <item>michroma</item>
+        <item>jetbrains_mono</item>
+        <item>roboto_mono</item>
+        <item>orbitron</item>
     </string-array>
 
     <string-array name="FontThumbs">
@@ -135,6 +155,16 @@
         <item>@drawable/ic_font_larabie</item>
         <item>@drawable/ic_font_ford</item>
         <item>@drawable/ic_font_ev</item>
+        <item>@drawable/ic_font_frutiger</item>
+        <item>@drawable/ic_font_vwcarui</item>
+        <item>@drawable/ic_font_vwtext</item>
+        <item>@drawable/ic_font_audi</item>
+        <item>@drawable/ic_font_ford</item>
+        <item>@drawable/ic_font_segments</item>
+        <item>@drawable/ic_font_frutiger</item>
+        <item>@drawable/ic_font_thesis</item>
+        <item>@drawable/ic_font_vwdigit</item>
+        <item>@drawable/ic_font_skoda</item>
     </string-array>
 
     <integer-array name="icons">
