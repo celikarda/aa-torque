@@ -15,8 +15,10 @@ def versionMajor = props.getProperty("majorVersion") as Integer
 def versionMinor = props.getProperty("minorVersion") as Integer
 def versionPatch = props.getProperty("patchVersion") as Integer
 def acraVersion = '5.11.3'
-def ghOwner = "agronick"
-def ghPackage = "aa-torque"
+// Fork default: point update checks to this repository.
+// Can be overridden with -PreleaseRepoOwner / -PreleaseRepoName.
+def ghOwner = (findProperty("releaseRepoOwner") ?: "celikarda") as String
+def ghPackage = (findProperty("releaseRepoName") ?: "aa-torque") as String
 
 
 android {

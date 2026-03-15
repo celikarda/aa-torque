@@ -13,6 +13,8 @@ This fork keeps upstream `aa-torque` content, links, and naming in this README f
 - Fork Android package/application ID: `com.aatorque.perfdash`
 - Upstream/original app package ID: `com.aatorque.stats`
 - Goal: install this fork side-by-side with the original app for testing
+- Fork releases for `Force update`: [celikarda/aa-torque releases](https://github.com/celikarda/aa-torque/releases)
+- Important: installing upstream `agronick/aa-torque` releases installs `com.aatorque.stats`, not `com.aatorque.perfdash`
 
 All references below to "AA Torque" or `aa-torque` are intentionally preserved from upstream.
 
@@ -51,7 +53,7 @@ all data from Torque in a way that is as customizable as possible.
 ## Install
 [Video guide for how to install](https://www.youtube.com/watch?v=DDxPrPzxZ3k)
 
-- Download the latest [release](https://github.com/agronick/aa-torque/releases). Pre-releases can only be installed through Kingstaller.
+- Download the latest fork [release](https://github.com/celikarda/aa-torque/releases) for `com.aatorque.perfdash`. Upstream releases are a different app ID.
 - Make sure Android Auto is in developer mode: Open Android Auto (while not connected to the car), go to About. Tap the "About Android Auto" header 10 times until you see a toast message saying you're a developer. From the right top corner select developer options, scroll down and make sure you check "Unknown sources". This will allow programs from non-Playstore apps to be run on Android Auto. [See a picture guide how to enable Developer mode here](https://www.howtogeek.com/271132/how-to-enable-developer-settings-on-android-auto/).
 - Install the APK that you downloaded in the _Prepare_ section using your normal package installer
 - Open _AA Torque Settings_

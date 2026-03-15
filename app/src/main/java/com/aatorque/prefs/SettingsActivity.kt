@@ -52,37 +52,39 @@ import javax.net.ssl.SSLException
 class SettingsActivity : AppCompatActivity(),
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
+    private var pendingDownloadId: Long = -1L
+
     val br: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.`package` == BuildConfig.APPLICATION_ID) {
-                AlertDialog.Builder(this@SettingsActivity).setTitle(R.string.download_complete)
-                    .setMessage(R.string.download_dialog)
-                    .setPositiveButton(android.R.string.ok, object: DialogInterface.OnClickListener{
-                        override fun onClick(p0: DialogInterface?, p1: Int) {
-                            val downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1L)
-                            if (downloadId == -1L) return
-                            val uri = (getSystemService(DOWNLOAD_SERVICE) as DownloadManager).getUriForDownloadedFile(downloadId)
-                            val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                Intent(Intent.ACTION_INSTALL_PACKAGE).also {
-                                    it.data = uri
-                                    it.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
-                                }
-                            } else {
-                                Intent(Intent.ACTION_VIEW).also {
-                                    it.setDataAndTypeAndNormalize(
-                                        uri,
-                                        "application/vnd.android.package-archive"
-                                    )
-                                    it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                }
+            val downloadId = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1L) ?: -1L
+            if (downloadId == -1L || (pendingDownloadId != -1L && downloadId != pendingDownloadId)) return
+
+            AlertDialog.Builder(this@SettingsActivity).setTitle(R.string.download_complete)
+                .setMessage(R.string.download_dialog)
+                .setPositiveButton(android.R.string.ok, object: DialogInterface.OnClickListener{
+                    override fun onClick(p0: DialogInterface?, p1: Int) {
+                        val uri = (getSystemService(DOWNLOAD_SERVICE) as DownloadManager).getUriForDownloadedFile(downloadId)
+                        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            Intent(Intent.ACTION_INSTALL_PACKAGE).also {
+                                it.data = uri
+                                it.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
                             }
-                            intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
-                            intent.putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, "com.android.vending")
-                            applicationContext.startActivity(intent)
+                        } else {
+                            Intent(Intent.ACTION_VIEW).also {
+                                it.setDataAndTypeAndNormalize(
+                                    uri,
+                                    "application/vnd.android.package-archive"
+                                )
+                                it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
                         }
-                    }).setNegativeButton(android.R.string.cancel
-                    ) { p0, p1 -> p0?.dismiss() }.show()
-            }
+                        intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
+                        intent.putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, "com.android.vending")
+                        applicationContext.startActivity(intent)
+                    }
+                }).setNegativeButton(android.R.string.cancel
+                ) { p0, p1 -> p0?.dismiss() }.show()
+            pendingDownloadId = -1L
         }
     }
 
@@ -362,9 +364,19 @@ class SettingsActivity : AppCompatActivity(),
                     JSONObject(it.readText())
                 }
                 val tagName = response.getString("tag_name")
-                downloadItem = response.getJSONArray("assets")
-                    .getJSONObject(0)
-                    .getString("browser_download_url")
+                val assets = response.getJSONArray("assets")
+                for (i in 0 until assets.length()) {
+                    val asset = assets.getJSONObject(i)
+                    val contentType = asset.optString("content_type")
+                    val name = asset.optString("name")
+                    if (
+                        contentType == "application/vnd.android.package-archive" ||
+                        name.endsWith(".apk", ignoreCase = true)
+                    ) {
+                        downloadItem = asset.optString("browser_download_url")
+                        break
+                    }
+                }
 
                 val tagSplit = tagName.split(".")
                 val existingSplit = BuildConfig.VERSION_NAME.split(".")
@@ -388,8 +400,7 @@ class SettingsActivity : AppCompatActivity(),
         }
 
 
-        if (needsUpdate == true) {
-            assert(downloadItem != null)
+        if (needsUpdate == true && !downloadItem.isNullOrBlank()) {
             Snackbar.make(
                 findViewById(android.R.id.content),
                 R.string.new_version,
@@ -405,13 +416,10 @@ class SettingsActivity : AppCompatActivity(),
                         ContextCompat.RECEIVER_EXPORTED
                     )
                     val downloadRequest = DownloadManager.Request(Uri.parse(downloadItem))
-                    downloadRequest.setDestinationInExternalPublicDir(
-                        Environment.DIRECTORY_DOWNLOADS,
-                        "aa-torque.apk"
-                    )
+                    downloadRequest.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "perfdash.apk")
                     downloadRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                     val dm = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-                    dm.enqueue(downloadRequest)
+                    pendingDownloadId = dm.enqueue(downloadRequest)
 
                     Toast.makeText(
                         baseContext,
@@ -421,7 +429,7 @@ class SettingsActivity : AppCompatActivity(),
                 }.show()
         }
 
-        return true
+        return needsUpdate != true || !downloadItem.isNullOrBlank()
     }
 
     private fun logsToClipboard() {
