@@ -4,6 +4,18 @@
 
 # Torque Plugin for Android Auto 
 
+## Fork note (perf-dash)
+This repository is a fork of [agronick/aa-torque](https://github.com/agronick/aa-torque).
+
+This fork keeps upstream `aa-torque` content, links, and naming in this README for context.
+
+- Fork app display name: `perf-dash`
+- Fork Android package/application ID: `com.aatorque.perfdash`
+- Upstream/original app package ID: `com.aatorque.stats`
+- Goal: install this fork side-by-side with the original app for testing
+
+All references below to "AA Torque" or `aa-torque` are intentionally preserved from upstream.
+
 ## Video Walkthrough
 (Click to open in YouTube)
 [![Click to open in YouTube](https://github.com/agronick/aa-torque/assets/2042303/b735fc1c-8732-4237-8a8d-a540a0d1f778
