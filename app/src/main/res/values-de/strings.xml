@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="activity_credits_title">Anerkennung</string>
-    <string name="activity_main_title">Leistungs-Monitor</string>
-    <string name="activity_settings_title">AA Torque Einstellungen</string>
+    <string name="activity_main_title">perf-dash</string>
+    <string name="activity_settings_title">perf-dash Settings</string>
 
     <!-- Fuzzy -->
     <string name="activity_stopwatch_title">Stoppuhr</string>
-    <string name="app_car_service_name">AA Torque</string>
-    <string name="app_name">AA Torque</string>
+    <string name="app_car_service_name">perf-dash</string>
+    <string name="app_name">perf-dash</string>
     <string name="credits_author">Basierend auf der App von:</string>
     <string name="credits_basedon">Basierend auf dem SDK und Demo-App von:</string>
     <string name="credits_drivesafely">Fahren Sie vorsichtig.</string>

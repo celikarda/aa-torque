@@ -3,11 +3,11 @@
     <string name="activity_credits_title">Credits</string>
 
     <!-- Fuzzy -->
-    <string name="activity_main_title">Performance Monitor</string>
-    <string name="activity_settings_title">Performance Monitor Instellingen</string>
+    <string name="activity_main_title">perf-dash</string>
+    <string name="activity_settings_title">perf-dash Settings</string>
     <string name="activity_stopwatch_title">Stopwatch</string>
-    <string name="app_car_service_name">Performance Monitor</string>
-    <string name="app_name">Performance Monitor</string>
+    <string name="app_car_service_name">perf-dash</string>
+    <string name="app_name">perf-dash</string>
     <string name="credits_author">Deze applicatie is gemaakt door:</string>
     <string name="credits_basedon">Gebaseerd op de SDK en demo App door:</string>
     <string name="credits_drivesafely">Rijd voorzichtig.</string>

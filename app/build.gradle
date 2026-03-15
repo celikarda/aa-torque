@@ -5,6 +5,7 @@ plugins {
 }
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 apply plugin: 'kotlin-parcelize'
 
 Properties props = new Properties()
@@ -22,7 +23,7 @@ android {
     namespace "com.aatorque.stats"
     compileSdk 34
     defaultConfig {
-        applicationId "com.aatorque.stats"
+        applicationId "com.aatorque.perfdash"
         minSdkVersion 28
         targetSdkVersion 34
         versionCode versionMajor * 1000 + versionMinor * 100 + versionPatch * 10
@@ -169,7 +170,7 @@ protobuf {
     // Configures the Protobuf compilation and the protoc executable
     protoc {
         // Downloads from the repositories
-        artifact = "com.google.protobuf:protoc:3.14.0"
+        artifact = "com.google.protobuf:protoc:3.25.1"
     }
 
     // Generates the java Protobuf-lite code for the Protobufs in this project
