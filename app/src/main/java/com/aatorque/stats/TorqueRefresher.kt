@@ -18,7 +18,7 @@ enum class ConnectStatus {
 
 class TorqueRefresher {
     val data = HashMap<Int, TorqueData>()
-    private val executor = ScheduledThreadPoolExecutor(7)
+    private val executor = ScheduledThreadPoolExecutor(16)
     val handler = Handler(Looper.getMainLooper())
     private var conWatcher = MutableStateFlow(ConnectStatus.CONNECTING_TORQUE)
     val connectStatus = conWatcher.asSharedFlow()

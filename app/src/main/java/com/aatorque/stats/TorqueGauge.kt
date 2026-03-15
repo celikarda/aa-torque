@@ -83,7 +83,8 @@ class TorqueGauge : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mMax.indicator = TriangleIndicator(requireContext())
-        mMax.indicator.color = requireContext().theme.obtainStyledAttributes(intArrayOf(R.attr.themedNeedleColor)).getColor(0, Color.RED)
+        mMax.indicator.color = Color.RED
+        mClock.indicator.color = Color.WHITE
         mMax.clearSections()
         mMax.addSections(
             Section(

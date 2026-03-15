@@ -29,6 +29,7 @@ import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.aatorque.datastore.Display
 import com.aatorque.datastore.UserPreference
 import com.aatorque.prefs.SettingsViewModel
 import com.aatorque.prefs.dataStore
@@ -56,9 +57,32 @@ open class DashboardFragment : AlbumArt() {
     private lateinit var mWrapper: RelativeLayout
     lateinit var mConStatus: TextView
 
-    var guages = arrayOfNulls<TorqueGauge>(3)
-    var displays = arrayOfNulls<TorqueDisplay>(4)
-    var gaugeViews = arrayOfNulls<FragmentContainerView>(3)
+    private val gaugeIds = intArrayOf(
+        R.id.gauge1,
+        R.id.gauge2,
+        R.id.gauge3,
+        R.id.gauge4,
+        R.id.gauge5,
+        R.id.gauge6,
+        R.id.gauge7,
+        R.id.gauge8,
+        R.id.gauge9,
+        R.id.gauge10,
+    )
+    private val displayIds = intArrayOf(
+        R.id.display1,
+        R.id.display2,
+        R.id.display3,
+        R.id.display4,
+    )
+    private val gaugeOffset = gaugeIds.size
+
+    private val hiddenGauge = Display.newBuilder().setDisabled(true).build()
+    private val hiddenDisplay = Display.newBuilder().setDisabled(true).build()
+
+    var guages = arrayOfNulls<TorqueGauge>(gaugeIds.size)
+    var displays = arrayOfNulls<TorqueDisplay>(displayIds.size)
+    var gaugeViews = arrayOfNulls<FragmentContainerView>(gaugeIds.size)
 
     private var screensAnimating = false
     private var mStarted = false
@@ -90,11 +114,6 @@ open class DashboardFragment : AlbumArt() {
                 binding.colorFilter = value
             }
         }
-
-    companion object {
-        const val DISPLAY_OFFSET = 3
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,26 +149,39 @@ open class DashboardFragment : AlbumArt() {
 
                 if (it.showChart) {
                     torqueChart.setupItems(
-                        screens.gaugesList.mapIndexed { index, display ->
+                        screens.gaugesList.take(gaugeIds.size).mapIndexed { index, display ->
                             torqueRefresher.updateIfNeeded(index, screenIndex, display)
                         }.toTypedArray()
                     )
                 } else {
-                    screens.gaugesList.forEachIndexed { index, display ->
+                    screens.gaugesList.take(gaugeIds.size).forEachIndexed { index, display ->
                         if (showChartChanged || torqueRefresher.hasChanged(index, display)) {
                             val clock = torqueRefresher.populateQuery(index, screenIndex, display)
                             guages[index]?.setupClock(clock)
                         }
                     }
+                    for (index in screens.gaugesList.size until gaugeIds.size) {
+                        if (showChartChanged || torqueRefresher.hasChanged(index, hiddenGauge)) {
+                            val hidden = torqueRefresher.populateQuery(index, screenIndex, hiddenGauge)
+                            guages[index]?.setupClock(hidden)
+                        }
+                    }
                 }
-                screens.displaysList.forEachIndexed { index, display ->
-                    if (torqueRefresher.hasChanged(index + DISPLAY_OFFSET, display)) {
+                screens.displaysList.take(displayIds.size).forEachIndexed { index, display ->
+                    if (torqueRefresher.hasChanged(index + gaugeOffset, display)) {
                         val td = torqueRefresher.populateQuery(
-                            index + DISPLAY_OFFSET,
+                            index + gaugeOffset,
                             screenIndex,
                             display
                         )
                         displays[index]?.setupElement(td)
+                    }
+                }
+                for (index in screens.displaysList.size until displayIds.size) {
+                    val pos = index + gaugeOffset
+                    if (torqueRefresher.hasChanged(pos, hiddenDisplay)) {
+                        val hidden = torqueRefresher.populateQuery(pos, screenIndex, hiddenDisplay)
+                        displays[index]?.setupElement(hidden)
                     }
                 }
                 torqueRefresher.makeExecutors(torqueService)
@@ -243,19 +275,14 @@ open class DashboardFragment : AlbumArt() {
         mTitleElement = binding.textTitle
         mWrapper = binding.includeWrap
         mConStatus = binding.conStatus
-        gaugeViews[0] = binding.gaugeLeft
-        gaugeViews[1] = binding.gaugeCenter
-        gaugeViews[2] = binding.gaugeRight
-
-        guages[0] = childFragmentManager.findFragmentById(R.id.gaugeLeft)!! as TorqueGauge
-        guages[1] = childFragmentManager.findFragmentById(R.id.gaugeCenter)!! as TorqueGauge
-        guages[2] = childFragmentManager.findFragmentById(R.id.gaugeRight)!! as TorqueGauge
-        displays[0] = childFragmentManager.findFragmentById(R.id.display1)!! as TorqueDisplay
-        displays[1] = childFragmentManager.findFragmentById(R.id.display2)!! as TorqueDisplay
-        displays[2] = childFragmentManager.findFragmentById(R.id.display3)!! as TorqueDisplay
-        displays[3] = childFragmentManager.findFragmentById(R.id.display4)!! as TorqueDisplay
-        displays[2]!!.isBottomDisplay = true
-        displays[3]!!.isBottomDisplay = true
+        gaugeIds.forEachIndexed { index, id ->
+            gaugeViews[index] = rootView.findViewById(id)
+            guages[index] = childFragmentManager.findFragmentById(id) as TorqueGauge
+        }
+        displayIds.forEachIndexed { index, id ->
+            displays[index] = childFragmentManager.findFragmentById(id) as TorqueDisplay
+            displays[index]?.isBottomDisplay = false
+        }
         torqueChart = childFragmentManager.findFragmentById(R.id.chartFrag)!! as TorqueChart
         val filter = IntentFilter().apply { addAction("KEY_DOWN") }
         LocalBroadcastManager.getInstance(requireContext())
