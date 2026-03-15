@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <import type="android.graphics.Typeface" />
+        <import type="android.view.View" />
+
+        <variable
+            name="font"
+            type="Typeface" />
+
+        <variable
+            name="value"
+            type="String" />
+
+        <variable
+            name="visible"
+            type="Boolean" />
+    </data>
+
+    <TextView
+        android:id="@+id/valueElement"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:maxLines="1"
+        android:minWidth="56dp"
+        android:text="@{value}"
+        android:textColor="@android:color/white"
+        android:textSize="13sp"
+        android:typeface="@{font}"
+        android:visibility="@{visible ? View.VISIBLE : View.INVISIBLE}" />
+</layout>

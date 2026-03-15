@@ -16,22 +16,28 @@ class CacheLogTree: Timber.DebugTree() {
         val throwable: Throwable?,
     )
 
-    val logCache = ArrayDeque<LogDesc>(KEEP_LOGS)
+    private val logCache = ArrayDeque<LogDesc>(KEEP_LOGS)
+    private val logLock = Any()
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
         if (BuildConfig.DEBUG) {
             super.log(priority, "AATORQUE:${tag ?: ""}", message, t)
         }
-        logCache.add(
-            LogDesc(priority, tag, message, t)
-        )
-        while (logCache.size > KEEP_LOGS) {
-            logCache.removeFirst()
+        synchronized(logLock) {
+            logCache.add(
+                LogDesc(priority, tag, message, t)
+            )
+            while (logCache.size > KEEP_LOGS) {
+                logCache.removeFirst()
+            }
         }
     }
 
     fun logToString(): Array<String> {
-        return logCache.map {
+        val snapshot = synchronized(logLock) {
+            logCache.toList()
+        }
+        return snapshot.map {
             return@map try {
                 val level = when (it.priority) {
                     Log.ERROR -> "Error"

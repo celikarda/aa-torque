@@ -1,86 +1,36 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:insetLeft="22dp"
-        android:insetTop="6dp"
-        android:insetRight="22dp"
-        android:insetBottom="6dp">
-        <shape android:shape="rectangle">
-            <corners android:radius="26dp" />
-            <solid android:color="#18000000" />
-            <stroke
-                android:width="2dp"
-                android:color="#CCFFFFFF" />
-        </shape>
-    </item>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="240dp"
+    android:viewportWidth="120"
+    android:viewportHeight="240">
 
-    <item
-        android:insetLeft="30dp"
-        android:insetTop="26dp"
-        android:insetRight="30dp"
-        android:insetBottom="26dp">
-        <shape android:shape="rectangle">
-            <corners android:radius="16dp" />
-            <solid android:color="#22000000" />
-            <stroke
-                android:width="2dp"
-                android:color="#99FFFFFF" />
-        </shape>
-    </item>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#CCFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2"
+        android:pathData="M42,8 L78,8 C88,8 96,16 96,26 L96,214 C96,224 88,232 78,232 L42,232 C32,232 24,224 24,214 L24,26 C24,16 32,8 42,8 Z" />
 
-    <item
-        android:insetLeft="18dp"
-        android:insetTop="28dp"
-        android:insetRight="68dp"
-        android:insetBottom="28dp">
-        <shape android:shape="rectangle">
-            <corners android:radius="6dp" />
-            <solid android:color="#AA0F1014" />
-            <stroke
-                android:width="1dp"
-                android:color="#CCFFFFFF" />
-        </shape>
-    </item>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#88FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeWidth="2"
+        android:pathData="M36,34 L84,34 M36,206 L84,206 M36,54 L84,54 M36,186 L84,186" />
 
-    <item
-        android:insetLeft="68dp"
-        android:insetTop="28dp"
-        android:insetRight="18dp"
-        android:insetBottom="28dp">
-        <shape android:shape="rectangle">
-            <corners android:radius="6dp" />
-            <solid android:color="#AA0F1014" />
-            <stroke
-                android:width="1dp"
-                android:color="#CCFFFFFF" />
-        </shape>
-    </item>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#CCFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeWidth="2"
+        android:pathData="M22,62 L98,62 M22,178 L98,178 M60,62 L60,178" />
 
-    <item
-        android:insetLeft="18dp"
-        android:insetTop="68dp"
-        android:insetRight="68dp"
-        android:insetBottom="68dp">
-        <shape android:shape="rectangle">
-            <corners android:radius="6dp" />
-            <solid android:color="#AA0F1014" />
-            <stroke
-                android:width="1dp"
-                android:color="#CCFFFFFF" />
-        </shape>
-    </item>
-
-    <item
-        android:insetLeft="68dp"
-        android:insetTop="68dp"
-        android:insetRight="18dp"
-        android:insetBottom="68dp">
-        <shape android:shape="rectangle">
-            <corners android:radius="6dp" />
-            <solid android:color="#AA0F1014" />
-            <stroke
-                android:width="1dp"
-                android:color="#CCFFFFFF" />
-        </shape>
-    </item>
-</layer-list>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#CCFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2"
+        android:pathData="M8,46 L22,46 L22,78 L8,78 Z M98,46 L112,46 L112,78 L98,78 Z M8,162 L22,162 L22,194 L8,194 Z M98,162 L112,162 L112,194 L98,194 Z" />
+</vector>

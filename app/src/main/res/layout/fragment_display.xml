@@ -34,7 +34,7 @@
 
         <TextView
             android:id="@+id/valueElement"
-            android:layout_width="96dp"
+            android:layout_width="84dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="0dp"
@@ -45,13 +45,13 @@
             android:text="@{value}"
             android:textAlignment="gravity"
             android:textColor="@android:color/white"
-            android:textSize="20sp"
+            android:textSize="17sp"
             android:typeface="@{font}" />
 
     <TextView
         android:id="@+id/iconElement"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:alpha="1.0"
@@ -62,7 +62,7 @@
         android:textAlignment="gravity"
         android:singleLine="true"
         android:textColor="@android:color/white"
-        android:textSize="12sp"
+        android:textSize="11sp"
         android:text="@{iconText}"
         app:backgroundResource="@{icon ?? 0}" />
 

@@ -109,6 +109,7 @@
     <string name="min_value">Minimum value</string>
     <string name="max_value">Maximum value</string>
     <string name="num_screens">Number of dashboards to display</string>
+    <string name="dashboard_style">Dashboard style</string>
     <string name="unit">Unit</string>
     <string name="dashboards">Dashboards</string>
     <string name="rotary_input">Rotary input</string>

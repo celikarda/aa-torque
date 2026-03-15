@@ -14,6 +14,14 @@
             android:inputType="text"
             android:persistent="false"
             />
+
+        <ListPreference
+            android:key="dashboardStyle"
+            android:title="@string/dashboard_style"
+            android:entries="@array/dashboard_style_entries"
+            android:entryValues="@array/dashboard_style_values"
+            android:defaultValue="classic"
+            android:persistent="false" />
     </PreferenceCategory>
     <PreferenceCategory android:key="displayOptions" />
 </PreferenceScreen>

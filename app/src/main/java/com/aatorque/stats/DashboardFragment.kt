@@ -25,10 +25,11 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.InputDeviceCompat
-import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.aatorque.prefs.DashboardStyle
+import com.aatorque.prefs.styleFromScreen
 import com.aatorque.datastore.Display
 import com.aatorque.datastore.UserPreference
 import com.aatorque.prefs.SettingsViewModel
@@ -57,32 +58,43 @@ open class DashboardFragment : AlbumArt() {
     private lateinit var mWrapper: RelativeLayout
     lateinit var mConStatus: TextView
 
-    private val gaugeIds = intArrayOf(
+    private val classicGaugeIds = intArrayOf(
+        R.id.classicGauge1,
+        R.id.classicGauge2,
+        R.id.classicGauge3,
+    )
+    private val denseGaugeIds = intArrayOf(
         R.id.gauge1,
         R.id.gauge2,
         R.id.gauge3,
         R.id.gauge4,
         R.id.gauge5,
         R.id.gauge6,
-        R.id.gauge7,
-        R.id.gauge8,
-        R.id.gauge9,
-        R.id.gauge10,
     )
-    private val displayIds = intArrayOf(
+    private val classicDisplayIds = intArrayOf(
+        R.id.classicDisplay1,
+        R.id.classicDisplay2,
+        R.id.classicDisplay3,
+        R.id.classicDisplay4,
+    )
+    private val denseDisplayIds = intArrayOf(
         R.id.display1,
         R.id.display2,
         R.id.display3,
         R.id.display4,
+        R.id.display5,
+        R.id.display6,
+        R.id.display7,
+        R.id.display8,
     )
-    private val gaugeOffset = gaugeIds.size
 
     private val hiddenGauge = Display.newBuilder().setDisabled(true).build()
     private val hiddenDisplay = Display.newBuilder().setDisabled(true).build()
 
-    var guages = arrayOfNulls<TorqueGauge>(gaugeIds.size)
-    var displays = arrayOfNulls<TorqueDisplay>(displayIds.size)
-    var gaugeViews = arrayOfNulls<FragmentContainerView>(gaugeIds.size)
+    private var classicGauges = arrayOfNulls<TorqueGauge>(classicGaugeIds.size)
+    private var denseGauges = arrayOfNulls<MiniTorqueGauge>(denseGaugeIds.size)
+    private var classicDisplays = arrayOfNulls<TorqueDisplay>(classicDisplayIds.size)
+    private var denseDisplays = arrayOfNulls<TyreValueDisplay>(denseDisplayIds.size)
 
     private var screensAnimating = false
     private var mStarted = false
@@ -138,10 +150,16 @@ open class DashboardFragment : AlbumArt() {
             data -> data.collect {
                 val screenIndex = abs(it.currentScreen) % it.screensCount
                 val screens = it.screensList[screenIndex]
+                val style = styleFromScreen(screens)
+                val isDense = style == DashboardStyle.DENSE
+                val activeGaugeCount = if (isDense) denseGaugeIds.size else classicGaugeIds.size
+                val activeDisplayCount = if (isDense) denseDisplayIds.size else classicDisplayIds.size
+                val displayOffset = activeGaugeCount
                 val showChartChanged = binding.showChart != it.showChart
-            binding.title = screens.title
-            binding.showBtns = false
-            settingsViewModel.chartVisible.value = it.showChart
+                binding.title = screens.title
+                binding.showBtns = false
+                binding.denseStyle = isDense
+                settingsViewModel.chartVisible.value = it.showChart
                 settingsViewModel.minMaxBelow.value = it.minMaxBelow
                 shouldDisplayArtwork = it.albumArt
 
@@ -149,39 +167,44 @@ open class DashboardFragment : AlbumArt() {
 
                 if (it.showChart) {
                     torqueChart.setupItems(
-                        screens.gaugesList.take(gaugeIds.size).mapIndexed { index, display ->
+                        screens.gaugesList.take(activeGaugeCount).mapIndexed { index, display ->
                             torqueRefresher.updateIfNeeded(index, screenIndex, display)
                         }.toTypedArray()
                     )
                 } else {
-                    screens.gaugesList.take(gaugeIds.size).forEachIndexed { index, display ->
+                    screens.gaugesList.take(activeGaugeCount).forEachIndexed { index, display ->
                         if (showChartChanged || torqueRefresher.hasChanged(index, display)) {
                             val clock = torqueRefresher.populateQuery(index, screenIndex, display)
-                            guages[index]?.setupClock(clock)
+                            setupGauge(isDense, index, clock)
                         }
                     }
-                    for (index in screens.gaugesList.size until gaugeIds.size) {
+                    for (index in screens.gaugesList.size until activeGaugeCount) {
                         if (showChartChanged || torqueRefresher.hasChanged(index, hiddenGauge)) {
                             val hidden = torqueRefresher.populateQuery(index, screenIndex, hiddenGauge)
-                            guages[index]?.setupClock(hidden)
+                            setupGauge(isDense, index, hidden)
                         }
                     }
                 }
-                screens.displaysList.take(displayIds.size).forEachIndexed { index, display ->
-                    if (torqueRefresher.hasChanged(index + gaugeOffset, display)) {
+                screens.displaysList.take(activeDisplayCount).forEachIndexed { index, display ->
+                    val adjustedDisplay = if (isDense) {
+                        display.toBuilder().setShowLabel(false).setIcon("ic_none").build()
+                    } else {
+                        display
+                    }
+                    if (torqueRefresher.hasChanged(index + displayOffset, adjustedDisplay)) {
                         val td = torqueRefresher.populateQuery(
-                            index + gaugeOffset,
+                            index + displayOffset,
                             screenIndex,
-                            display
+                            adjustedDisplay
                         )
-                        displays[index]?.setupElement(td)
+                        setupDisplay(isDense, index, td)
                     }
                 }
-                for (index in screens.displaysList.size until displayIds.size) {
-                    val pos = index + gaugeOffset
+                for (index in screens.displaysList.size until activeDisplayCount) {
+                    val pos = index + displayOffset
                     if (torqueRefresher.hasChanged(pos, hiddenDisplay)) {
                         val hidden = torqueRefresher.populateQuery(pos, screenIndex, hiddenDisplay)
-                        displays[index]?.setupElement(hidden)
+                        setupDisplay(isDense, index, hidden)
                     }
                 }
                 torqueRefresher.makeExecutors(torqueService)
@@ -275,13 +298,17 @@ open class DashboardFragment : AlbumArt() {
         mTitleElement = binding.textTitle
         mWrapper = binding.includeWrap
         mConStatus = binding.conStatus
-        gaugeIds.forEachIndexed { index, id ->
-            gaugeViews[index] = rootView.findViewById(id)
-            guages[index] = childFragmentManager.findFragmentById(id) as TorqueGauge
+        classicGaugeIds.forEachIndexed { index, id ->
+            classicGauges[index] = childFragmentManager.findFragmentById(id) as TorqueGauge
         }
-        displayIds.forEachIndexed { index, id ->
-            displays[index] = childFragmentManager.findFragmentById(id) as TorqueDisplay
-            displays[index]?.isBottomDisplay = false
+        denseGaugeIds.forEachIndexed { index, id ->
+            denseGauges[index] = childFragmentManager.findFragmentById(id) as MiniTorqueGauge
+        }
+        classicDisplayIds.forEachIndexed { index, id ->
+            classicDisplays[index] = childFragmentManager.findFragmentById(id) as TorqueDisplay
+        }
+        denseDisplayIds.forEachIndexed { index, id ->
+            denseDisplays[index] = childFragmentManager.findFragmentById(id) as TyreValueDisplay
         }
         torqueChart = childFragmentManager.findFragmentById(R.id.chartFrag)!! as TorqueChart
         val filter = IntentFilter().apply { addAction("KEY_DOWN") }
@@ -387,6 +414,22 @@ open class DashboardFragment : AlbumArt() {
                 }
             }
         })
+    }
+
+    private fun setupGauge(isDense: Boolean, index: Int, clock: TorqueData) {
+        if (isDense) {
+            denseGauges.getOrNull(index)?.setupClock(clock)
+        } else {
+            classicGauges.getOrNull(index)?.setupClock(clock)
+        }
+    }
+
+    private fun setupDisplay(isDense: Boolean, index: Int, data: TorqueData) {
+        if (isDense) {
+            denseDisplays.getOrNull(index)?.setupElement(data)
+        } else {
+            classicDisplays.getOrNull(index)?.setupElement(data)
+        }
     }
 
     override fun setupStatusBar(sc: StatusBarController) {

@@ -13,6 +13,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SeekBarPreference
+import com.aatorque.datastore.Screen
 import com.aatorque.datastore.UserPreference
 import com.aatorque.stats.NotiService
 import com.aatorque.stats.R
@@ -65,9 +66,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             val keeping = bldr.screensList.subList(0, intVal)
                             bldr = bldr.clearScreens().addAllScreens(keeping)
                         } else if (currentSettings.screensCount < intVal) {
-                            val newItms = Collections.nCopies(
+                            val newItms: List<Screen> = Collections.nCopies(
                                 intVal - currentSettings.screensCount,
-                                UserPreferenceSerializer.defaultScreen.build()
+                                UserPreferenceSerializer.defaultScreen
                             )
                             bldr = bldr.addAllScreens(newItms.toMutableList())
                             Timber.i("${newItms.size} added, ${intVal} specified")
